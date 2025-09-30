@@ -1,1 +1,327 @@
+Adapter Pattern
+// Target interface
+interface MediaPlayer {
+    void play(String fileName);
+}
+
+// Adaptee interface
+interface AdvancedMediaPlayer {
+    void playVlc(String fileName);
+    void playMp4(String fileName);
+}
+
+// Concrete implementation of Adaptee 1
+class VlcPlayer implements AdvancedMediaPlayer {
+    public void playVlc(String fileName) {
+        System.out.println("Playing VLC file. Name: " + fileName);
+    }
+    public void playMp4(String fileName) {}
+}
+
+// Concrete implementation of Adaptee 2
+class Mp4Player implements AdvancedMediaPlayer {
+    public void playVlc(String fileName) {}
+    public void playMp4(String fileName) {
+        System.out.println("Playing MP4 file. Name: " + fileName);
+    }
+}
+
+// Adapter class
+class MediaAdapter implements MediaPlayer {
+    private AdvancedMediaPlayer advancedMusicPlayer;
+
+    public MediaAdapter(String audioType) {
+        if(audioType.equalsIgnoreCase("vlc")){
+            advancedMusicPlayer = new VlcPlayer();
+        }
+        else if(audioType.equalsIgnoreCase("mp4")){
+            advancedMusicPlayer = new Mp4Player();
+        }
+    }
+
+    public void play(String audioType, String fileName) {
+        if(audioType.equalsIgnoreCase("vlc")){
+            advancedMusicPlayer.playVlc(fileName);
+        }
+        else if(audioType.equalsIgnoreCase("mp4")){
+            advancedMusicPlayer.playMp4(fileName);
+        }
+    }
+}
+
+// Concrete class to play media
+class AudioPlayer implements MediaPlayer {
+    MediaAdapter mediaAdapter;
+
+    public void play(String audioType, String fileName) {
+        if(audioType.equalsIgnoreCase("mp3")){
+            System.out.println("Playing MP3 file. Name: " + fileName);
+        }
+        else if(audioType.equalsIgnoreCase("vlc") || audioType.equalsIgnoreCase("mp4")){
+            mediaAdapter = new MediaAdapter(audioType);
+            mediaAdapter.play(audioType, fileName);
+        }
+        else {
+            System.out.println("Invalid media type: " + audioType);
+        }
+    }
+}
+
+public class AdapterPatternDemo {
+    public static void main(String[] args) {
+        AudioPlayer audioPlayer = new AudioPlayer();
+
+        audioPlayer.play("mp3", "beyond the horizon.mp3");
+        audioPlayer.play("mp4", "alone.mp4");
+        audioPlayer.play("vlc", "far far away.vlc");
+    }
+}
+
+
+
+Bridge Pattern
+// Abstraction
+abstract class Shape {
+    protected Color color;
+
+    public Shape(Color color) {
+        this.color = color;
+    }
+
+    abstract void draw();
+}
+
+// Refined Abstraction
+class Circle extends Shape {
+    private int radius;
+
+    public Circle(Color color, int radius) {
+        super(color);
+        this.radius = radius;
+    }
+
+    @Override
+    void draw() {
+        System.out.println("Drawing Circle with radius: " + radius + " and color: " + color.fill());
+    }
+}
+
+// Implementor
+interface Color {
+    String fill();
+}
+
+// Concrete Implementor 1
+class Red implements Color {
+    @Override
+    public String fill() {
+        return "Red";
+    }
+}
+
+// Concrete Implementor 2
+class Blue implements Color {
+    @Override
+    public String fill() {
+        return "Blue";
+    }
+}
+
+public class BridgePatternDemo {
+    public static void main(String[] args) {
+        Shape redCircle = new Circle(new Red(), 5);
+        redCircle.draw();
+
+        Shape blueCircle = new Circle(new Blue(), 10);
+        blueCircle.draw();
+    }
+}
+
+
+
+Composite Pattern
+import java.util.ArrayList;
+import java.util.List;
+
+// Component
+interface Employee {
+    void showEmployeeDetails();
+}
+
+// Leaf
+class Developer implements Employee {
+    private String name;
+
+    public Developer(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void showEmployeeDetails() {
+        System.out.println("Developer: " + name);
+    }
+}
+
+// Leaf
+class Tester implements Employee {
+    private String name;
+
+    public Tester(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void showEmployeeDetails() {
+        System.out.println("Tester: " + name);
+    }
+}
+
+// Composite
+class Manager implements Employee {
+    private List<Employee> employees = new ArrayList<>();
+    private String name;
+
+    public Manager(String name) {
+        this.name = name;
+    }
+
+    public void addEmployee(Employee employee) {
+        employees.add(employee);
+    }
+
+    @Override
+    public void showEmployeeDetails() {
+        System.out.println("Manager: " + name);
+        for (Employee employee : employees) {
+            employee.showEmployeeDetails();
+        }
+    }
+}
+
+public class CompositePatternDemo {
+    public static void main(String[] args) {
+        Developer dev1 = new Developer("Alice");
+        Developer dev2 = new Developer("Bob");
+        Tester tester = new Tester("Charlie");
+
+        Manager manager = new Manager("David");
+        manager.addEmployee(dev1);
+        manager.addEmployee(dev2);
+        manager.addEmployee(tester);
+
+        manager.showEmployeeDetails();
+    }
+}
+
+
+
+Decorator Pattern
+// Component
+interface Coffee {
+    String make();
+}
+
+// Concrete Component
+class SimpleCoffee implements Coffee {
+    @Override
+    public String make() {
+        return "Simple coffee";
+    }
+}
+
+// Decorator
+class MilkDecorator implements Coffee {
+    private Coffee coffee;
+
+    public MilkDecorator(Coffee coffee) {
+        this.coffee = coffee;
+    }
+
+    @Override
+    public String make() {
+        return coffee.make() + " + Milk";
+    }
+}
+
+// Another Decorator
+class SugarDecorator implements Coffee {
+    private Coffee coffee;
+
+    public SugarDecorator(Coffee coffee) {
+        this.coffee = coffee;
+    }
+
+    @Override
+    public String make() {
+        return coffee.make() + " + Sugar";
+    }
+}
+
+public class DecoratorPatternDemo {
+    public static void main(String[] args) {
+        Coffee simpleCoffee = new SimpleCoffee();
+        System.out.println(simpleCoffee.make());
+
+        Coffee milkCoffee = new MilkDecorator(new SimpleCoffee());
+        System.out.println(milkCoffee.make());
+
+        Coffee milkSugarCoffee = new SugarDecorator(new MilkDecorator(new SimpleCoffee()));
+        System.out.println(milkSugarCoffee.make());
+    }
+}
+
+
+
+Facade Pattern
+// Subsystem 1
+class CPU {
+    public void processData() {
+        System.out.println("CPU processing data...");
+    }
+}
+
+// Subsystem 2
+class Memory {
+    public void loadData() {
+        System.out.println("Memory loading data...");
+    }
+}
+
+// Subsystem 3
+class HardDrive {
+    public void readData() {
+        System.out.println("Hard Drive reading data...");
+    }
+}
+
+// Facade
+class ComputerFacade {
+    private CPU cpu;
+    private Memory memory;
+    private HardDrive hardDrive;
+
+    public ComputerFacade(CPU cpu, Memory memory, HardDrive hardDrive) {
+        this.cpu = cpu;
+        this.memory = memory;
+        this.hardDrive = hardDrive;
+    }
+
+    public void startComputer() {
+        cpu.processData();
+        memory.loadData();
+        hardDrive.readData();
+        System.out.println("Computer started successfully!");
+    }
+}
+
+public class FacadePatternDemo {
+    public static void main(String[] args) {
+        CPU cpu = new CPU();
+        Memory memory = new Memory();
+        HardDrive hardDrive = new HardDrive();
+        ComputerFacade computer = new ComputerFacade(cpu, memory, hardDrive);
+        
+        computer.startComputer();
+    }
+}
 
