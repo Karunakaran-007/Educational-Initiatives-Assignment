@@ -76,3 +76,233 @@ public class ObserverPatternDemo {
     }
 }
 
+Strategy Pattern
+// Strategy interface
+interface SortStrategy {
+    void sort(int[] array);
+}
+
+// Concrete Strategy 1: QuickSort
+class QuickSort implements SortStrategy {
+    @Override
+    public void sort(int[] array) {
+        System.out.println("Sorting array using QuickSort.");
+        // Implement QuickSort algorithm here
+    }
+}
+
+// Concrete Strategy 2: MergeSort
+class MergeSort implements SortStrategy {
+    @Override
+    public void sort(int[] array) {
+        System.out.println("Sorting array using MergeSort.");
+        // Implement MergeSort algorithm here
+    }
+}
+
+// Context class
+class SortingContext {
+    private SortStrategy sortStrategy;
+
+    public void setSortStrategy(SortStrategy sortStrategy) {
+        this.sortStrategy = sortStrategy;
+    }
+
+    public void executeSort(int[] array) {
+        sortStrategy.sort(array);
+    }
+}
+
+public class StrategyPatternDemo {
+    public static void main(String[] args) {
+        SortingContext context = new SortingContext();
+
+        int[] array = {5, 2, 9, 1, 5, 6};
+
+        context.setSortStrategy(new QuickSort());
+        context.executeSort(array);
+
+        context.setSortStrategy(new MergeSort());
+        context.executeSort(array);
+    }
+}
+
+
+State Pattern
+// State Interface
+interface GameState {
+    void play();
+}
+
+// Concrete State: Paused
+class PausedState implements GameState {
+    @Override
+    public void play() {
+        System.out.println("Game is paused.");
+    }
+}
+
+// Concrete State: Playing
+class PlayingState implements GameState {
+    @Override
+    public void play() {
+        System.out.println("Game is now playing.");
+    }
+}
+
+// Context class
+class Game {
+    private GameState currentState;
+
+    public void setGameState(GameState state) {
+        this.currentState = state;
+    }
+
+    public void play() {
+        currentState.play();
+    }
+}
+
+public class StatePatternDemo {
+    public static void main(String[] args) {
+        Game game = new Game();
+
+        game.setGameState(new PausedState());
+        game.play();
+
+        game.setGameState(new PlayingState());
+        game.play();
+    }
+}
+Command Pattern
+// Command Interface
+interface Command {
+    void execute();
+}
+
+// Concrete Command: TurnOnCommand
+class TurnOnCommand implements Command {
+    private Light light;
+
+    public TurnOnCommand(Light light) {
+        this.light = light;
+    }
+
+    @Override
+    public void execute() {
+        light.turnOn();
+    }
+}
+
+// Concrete Command: TurnOffCommand
+class TurnOffCommand implements Command {
+    private Light light;
+
+    public TurnOffCommand(Light light) {
+        this.light = light;
+    }
+
+    @Override
+    public void execute() {
+        light.turnOff();
+    }
+}
+
+// Receiver class
+class Light {
+    public void turnOn() {
+        System.out.println("The light is ON.");
+    }
+
+    public void turnOff() {
+        System.out.println("The light is OFF.");
+    }
+}
+
+// Invoker class
+class RemoteControl {
+    private Command command;
+
+    public void setCommand(Command command) {
+        this.command = command;
+    }
+
+    public void pressButton() {
+        command.execute();
+    }
+}
+
+public class CommandPatternDemo {
+    public static void main(String[] args) {
+        Light livingRoomLight = new Light();
+        
+        Command turnOn = new TurnOnCommand(livingRoomLight);
+        Command turnOff = new TurnOffCommand(livingRoomLight);
+        
+        RemoteControl remote = new RemoteControl();
+        
+        remote.setCommand(turnOn);
+        remote.pressButton();
+        
+        remote.setCommand(turnOff);
+        remote.pressButton();
+    }
+}
+Iterator Pattern
+// Iterator Interface
+interface Iterator {
+    boolean hasNext();
+    Object next();
+}
+
+// Concrete Iterator
+class NameIterator implements Iterator {
+    private String[] names;
+    private int position;
+
+    public NameIterator(String[] names) {
+        this.names = names;
+        position = 0;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return position < names.length;
+    }
+
+    @Override
+    public Object next() {
+        if (hasNext()) {
+            return names[position++];
+        }
+        return null;
+    }
+}
+
+// Aggregate Interface
+interface NameRepository {
+    Iterator createIterator();
+}
+
+// Concrete Aggregate
+class NameRepositoryImpl implements NameRepository {
+    private String[] names = {"Alice", "Bob", "Charlie"};
+
+    @Override
+    public Iterator createIterator() {
+        return new NameIterator(names);
+    }
+}
+
+public class IteratorPatternDemo {
+    public static void main(String[] args) {
+        NameRepository repository = new NameRepositoryImpl();
+        Iterator iterator = repository.createIterator();
+
+        while (iterator.hasNext()) {
+            System.out.println("Name: " + iterator.next());
+        }
+    }
+}
+
+
