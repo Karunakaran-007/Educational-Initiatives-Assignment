@@ -1,1 +1,297 @@
+Abstract Factory Pattern
+// Abstract Product A
+interface Chair {
+    void create();
+}
+
+// Abstract Product B
+interface Table {
+    void create();
+}
+
+// Concrete Product A1
+class VictorianChair implements Chair {
+    public void create() {
+        System.out.println("Victorian Chair Created.");
+    }
+}
+
+// Concrete Product B1
+class VictorianTable implements Table {
+    public void create() {
+        System.out.println("Victorian Table Created.");
+    }
+}
+
+// Concrete Product A2
+class ModernChair implements Chair {
+    public void create() {
+        System.out.println("Modern Chair Created.");
+    }
+}
+
+// Concrete Product B2
+class ModernTable implements Table {
+    public void create() {
+        System.out.println("Modern Table Created.");
+    }
+}
+
+// Abstract Factory
+interface FurnitureFactory {
+    Chair createChair();
+    Table createTable();
+}
+
+// Concrete Factory 1
+class VictorianFurnitureFactory implements FurnitureFactory {
+    public Chair createChair() {
+        return new VictorianChair();
+    }
+
+    public Table createTable() {
+        return new VictorianTable();
+    }
+}
+
+// Concrete Factory 2
+class ModernFurnitureFactory implements FurnitureFactory {
+    public Chair createChair() {
+        return new ModernChair();
+    }
+
+    public Table createTable() {
+        return new ModernTable();
+    }
+}
+
+public class AbstractFactoryPatternDemo {
+    public static void main(String[] args) {
+        FurnitureFactory factory = new VictorianFurnitureFactory();
+        Chair chair = factory.createChair();
+        Table table = factory.createTable();
+        chair.create();
+        table.create();
+    }
+}
+
+
+
+
+Builder Pattern
+// Product
+class House {
+    private String walls;
+    private String roof;
+    private String doors;
+    private String windows;
+
+    public void setWalls(String walls) {
+        this.walls = walls;
+    }
+
+    public void setRoof(String roof) {
+        this.roof = roof;
+    }
+
+    public void setDoors(String doors) {
+        this.doors = doors;
+    }
+
+    public void setWindows(String windows) {
+        this.windows = windows;
+    }
+
+    @Override
+    public String toString() {
+        return "House [Walls=" + walls + ", Roof=" + roof + ", Doors=" + doors + ", Windows=" + windows + "]";
+    }
+}
+
+// Builder
+abstract class HouseBuilder {
+    protected House house;
+
+    public House getHouse() {
+        return house;
+    }
+
+    public void createNewHouse() {
+        house = new House();
+    }
+
+    public abstract void buildWalls();
+    public abstract void buildRoof();
+    public abstract void buildDoors();
+    public abstract void buildWindows();
+}
+
+// Concrete Builder
+class ModernHouseBuilder extends HouseBuilder {
+
+    @Override
+    public void buildWalls() {
+        house.setWalls("Concrete Walls");
+    }
+
+    @Override
+    public void buildRoof() {
+        house.setRoof("Modern Roof");
+    }
+
+    @Override
+    public void buildDoors() {
+        house.setDoors("Glass Doors");
+    }
+
+    @Override
+    public void buildWindows() {
+        house.setWindows("Large Windows");
+    }
+}
+
+public class BuilderPatternDemo {
+    public static void main(String[] args) {
+        HouseBuilder builder = new ModernHouseBuilder();
+        builder.createNewHouse();
+        builder.buildWalls();
+        builder.buildRoof();
+        builder.buildDoors();
+        builder.buildWindows();
+        
+        House house = builder.getHouse();
+        System.out.println(house);
+    }
+}
+
+
+
+
+Factory Method Pattern
+// Product
+interface Animal {
+    void speak();
+}
+
+// Concrete Product 1
+class Dog implements Animal {
+    public void speak() {
+        System.out.println("Woof");
+    }
+}
+
+// Concrete Product 2
+class Cat implements Animal {
+    public void speak() {
+        System.out.println("Meow");
+    }
+}
+
+// Creator
+abstract class AnimalFactory {
+    public abstract Animal createAnimal();
+}
+
+// Concrete Creator 1
+class DogFactory extends AnimalFactory {
+    public Animal createAnimal() {
+        return new Dog();
+    }
+}
+
+// Concrete Creator 2
+class CatFactory extends AnimalFactory {
+    public Animal createAnimal() {
+        return new Cat();
+    }
+}
+
+public class FactoryMethodPatternDemo {
+    public static void main(String[] args) {
+        AnimalFactory dogFactory = new DogFactory();
+        Animal dog = dogFactory.createAnimal();
+        dog.speak();
+
+        AnimalFactory catFactory = new CatFactory();
+        Animal cat = catFactory.createAnimal();
+        cat.speak();
+    }
+}
+
+
+
+
+Prototype Pattern
+// Prototype
+abstract class Shape implements Cloneable {
+    private String id;
+    public abstract void draw();
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+}
+
+// Concrete Prototype
+class Circle extends Shape {
+    public void draw() {
+        System.out.println("Drawing Circle");
+    }
+}
+
+class Square extends Shape {
+    public void draw() {
+        System.out.println("Drawing Square");
+    }
+}
+
+public class PrototypePatternDemo {
+    public static void main(String[] args) throws CloneNotSupportedException {
+        Circle circle = new Circle();
+        circle.setId("1");
+        
+        Circle clonedCircle = (Circle) circle.clone();
+        System.out.println("Cloned Circle ID: " + clonedCircle.getId());
+
+        Square square = new Square();
+        square.setId("2");
+
+        Square clonedSquare = (Square) square.clone();
+        System.out.println("Cloned Square ID: " + clonedSquare.getId());
+    }
+}
+
+
+
+
+Singleton Pattern
+// Singleton class
+class Singleton {
+    private static Singleton instance;
+
+    private Singleton() {}
+
+    public static synchronized Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+
+public class SingletonPatternDemo {
+    public static void main(String[] args) {
+        Singleton singleton = Singleton.getInstance();
+        System.out.println("Singleton instance: " + singleton);
+    }
+}
 
