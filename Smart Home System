@@ -1,1 +1,224 @@
+import java.util.*;
+
+// Device Interface
+interface Device {
+    void turnOn();
+    void turnOff();
+    String getStatus();
+    void addObserver(DeviceObserver observer);
+    void notifyObservers();
+}
+
+// Device Observer Interface
+interface DeviceObserver {
+    void update(String status);
+}
+
+// Concrete Devices
+class Light implements Device {
+    private String status = "off";
+    private List<DeviceObserver> observers = new ArrayList<>();
+
+    public void turnOn() {
+        this.status = "on";
+        notifyObservers();
+    }
+
+    public void turnOff() {
+        this.status = "off";
+        notifyObservers();
+    }
+
+    public String getStatus() {
+        return this.status;
+    }
+
+    public void addObserver(DeviceObserver observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObservers() {
+        for (DeviceObserver observer : observers) {
+            observer.update(this.status);
+        }
+    }
+}
+
+class Thermostat implements Device {
+    private String status = "off";
+    private int temperature = 70;
+    private List<DeviceObserver> observers = new ArrayList<>();
+
+    public void turnOn() {
+        this.status = "on";
+        notifyObservers();
+    }
+
+    public void turnOff() {
+        this.status = "off";
+        notifyObservers();
+    }
+
+    public String getStatus() {
+        return this.status + " at " + temperature + " degrees";
+    }
+
+    public void addObserver(DeviceObserver observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObservers() {
+        for (DeviceObserver observer : observers) {
+            observer.update(this.status + " at " + temperature + " degrees");
+        }
+    }
+
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
+        notifyObservers();
+    }
+}
+
+class DoorLock implements Device {
+    private String status = "locked";
+    private List<DeviceObserver> observers = new ArrayList<>();
+
+    public void turnOn() {
+        this.status = "unlocked";
+        notifyObservers();
+    }
+
+    public void turnOff() {
+        this.status = "locked";
+        notifyObservers();
+    }
+
+    public String getStatus() {
+        return this.status;
+    }
+
+    public void addObserver(DeviceObserver observer) {
+        observers.add(observer);
+    }
+
+    public void notifyObservers() {
+        for (DeviceObserver observer : observers) {
+            observer.update(this.status);
+        }
+    }
+}
+
+// Observer Class for monitoring changes
+class CentralHub implements DeviceObserver {
+    private String deviceStatus = "";
+
+    @Override
+    public void update(String status) {
+        this.deviceStatus = status;
+        displayStatus();
+    }
+
+    public void displayStatus() {
+        System.out.println("Central Hub Updated: Device Status is now: " + deviceStatus);
+    }
+}
+
+// Device Factory
+abstract class DeviceFactory {
+    abstract Device createDevice(String type);
+}
+
+class SmartDeviceFactory extends DeviceFactory {
+
+    @Override
+    Device createDevice(String type) {
+        switch (type) {
+            case "light":
+                return new Light();
+            case "thermostat":
+                return new Thermostat();
+            case "doorlock":
+                return new DoorLock();
+            default:
+                throw new IllegalArgumentException("Unknown device type.");
+        }
+    }
+}
+
+// Proxy Class to Control Access
+class DeviceProxy implements Device {
+    private Device device;
+    private boolean isAuthenticated;
+
+    public DeviceProxy(Device device, boolean isAuthenticated) {
+        this.device = device;
+        this.isAuthenticated = isAuthenticated;
+    }
+
+    public void turnOn() {
+        if (isAuthenticated) {
+            device.turnOn();
+        } else {
+            System.out.println("Access Denied: Unauthorized user.");
+        }
+    }
+
+    public void turnOff() {
+        if (isAuthenticated) {
+            device.turnOff();
+        } else {
+            System.out.println("Access Denied: Unauthorized user.");
+        }
+    }
+
+    public String getStatus() {
+        if (isAuthenticated) {
+            return device.getStatus();
+        } else {
+            return "Access Denied: Unauthorized user.";
+        }
+    }
+
+    public void addObserver(DeviceObserver observer) {
+        device.addObserver(observer);
+    }
+
+    public void notifyObservers() {
+        device.notifyObservers();
+    }
+}
+
+// Main Class to Simulate the System
+public class SmartHomeSystem {
+    public static void main(String[] args) {
+        // Create devices using the Factory Method
+        SmartDeviceFactory factory = new SmartDeviceFactory();
+        Device light = factory.createDevice("light");
+        Device thermostat = factory.createDevice("thermostat");
+        Device doorLock = factory.createDevice("doorlock");
+
+        // Central Hub observing the devices
+        CentralHub hub = new CentralHub();
+        light.addObserver(hub);
+        thermostat.addObserver(hub);
+        doorLock.addObserver(hub);
+
+        // Using Proxy to control access
+        DeviceProxy lightProxy = new DeviceProxy(light, true);
+        DeviceProxy thermostatProxy = new DeviceProxy(thermostat, true);
+        DeviceProxy doorLockProxy = new DeviceProxy(doorLock, false);
+
+        // Simulate user commands
+        lightProxy.turnOn();
+        thermostatProxy.turnOn();
+        doorLockProxy.turnOn();
+
+        // Simulate status update
+        thermostatProxy.setTemperature(75); // Triggering status change
+        System.out.println(thermostatProxy.getStatus()); // Check status
+
+        // Testing unauthorized access to door lock
+        doorLockProxy.turnOn(); // Should print "Access Denied"
+    }
+}
 
